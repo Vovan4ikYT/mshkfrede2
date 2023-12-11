@@ -1,3 +1,5 @@
+# Главное меню
+
 import pygame
 import sys
 from random import choice

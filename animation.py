@@ -1,3 +1,5 @@
+# Анимация
+
 from pygame import *
 
 

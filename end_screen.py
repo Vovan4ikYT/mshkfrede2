@@ -1,3 +1,5 @@
+# Гейм овер
+
 import pygame
 import sys
 from animation import Animation
