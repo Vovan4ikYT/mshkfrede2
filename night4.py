@@ -54,6 +54,7 @@ def foxy_move():
         pygame.mixer.Channel(2).play(foxy_poet)
     if 0 < foxy_count < 800:
         foxy_moving.change(0.2)
+        screen.blit(foxy_moving.image, (foxy_x, foxy_y))
     if foxy_count == 0 and foxy_state is True:
         foxy_death()
 
@@ -106,6 +107,5 @@ while True:
     clock.tick(60)
     vhs_effect.change(0.7)
     screen.blit(vhs_effect.image, (0, 0))
-    screen.blit(foxy_moving.image, (foxy_x, foxy_y))
     foxy_move()
     pygame.display.update()
