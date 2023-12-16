@@ -59,3 +59,15 @@ old_foxy = [pygame.image.load('gifs/old_foxy/jumpscare/old_foxy1.png'),
             pygame.image.load('gifs/old_foxy/jumpscare/old_foxy8.png'),
             pygame.image.load('gifs/old_foxy/jumpscare/old_foxy9.png'),
             pygame.image.load('gifs/old_foxy/jumpscare/old_foxy10.png')]
+
+baby = [pygame.image.load('gifs/baby/jumpscare/baby1.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby2.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby3.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby4.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby5.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby6.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby7.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby8.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby9.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby10.gif'),
+        pygame.image.load('gifs/baby/jumpscare/baby11.gif')]

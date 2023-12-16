@@ -2,6 +2,7 @@ import pygame
 import sys
 from random import choice
 from animation import Animation
+from jumpscares import baby
 
 pygame.mixer.init(channels=2)
 pygame.init()
@@ -68,39 +69,6 @@ def spring_death():
                      pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap31.gif'),
                      pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap32.gif')]
 
-    spring_rects = [spring_images[0].get_rect(center=(960, 540)),
-                    spring_images[1].get_rect(center=(960, 540)),
-                    spring_images[2].get_rect(center=(960, 540)),
-                    spring_images[3].get_rect(center=(960, 540)),
-                    spring_images[4].get_rect(center=(960, 540)),
-                    spring_images[5].get_rect(center=(960, 540)),
-                    spring_images[6].get_rect(center=(960, 540)),
-                    spring_images[7].get_rect(center=(960, 540)),
-                    spring_images[8].get_rect(center=(960, 540)),
-                    spring_images[9].get_rect(center=(960, 540)),
-                    spring_images[10].get_rect(center=(960, 540)),
-                    spring_images[11].get_rect(center=(960, 540)),
-                    spring_images[12].get_rect(center=(960, 540)),
-                    spring_images[13].get_rect(center=(960, 540)),
-                    spring_images[14].get_rect(center=(960, 540)),
-                    spring_images[15].get_rect(center=(960, 540)),
-                    spring_images[16].get_rect(center=(960, 540)),
-                    spring_images[17].get_rect(center=(960, 540)),
-                    spring_images[18].get_rect(center=(960, 540)),
-                    spring_images[19].get_rect(center=(960, 540)),
-                    spring_images[20].get_rect(center=(960, 540)),
-                    spring_images[21].get_rect(center=(960, 540)),
-                    spring_images[22].get_rect(center=(960, 540)),
-                    spring_images[23].get_rect(center=(960, 540)),
-                    spring_images[24].get_rect(center=(960, 540)),
-                    spring_images[25].get_rect(center=(960, 540)),
-                    spring_images[26].get_rect(center=(960, 540)),
-                    spring_images[27].get_rect(center=(960, 540)),
-                    spring_images[28].get_rect(center=(960, 540)),
-                    spring_images[29].get_rect(center=(960, 540)),
-                    spring_images[30].get_rect(center=(960, 540)),
-                    spring_images[31].get_rect(center=(960, 540))]
-
     spring_gif = Animation(spring_images, time_interval=32)
     jumpscare = pygame.mixer.Sound('sounds/jumpscares/spring_jumpscare.mp3')
     pygame.mixer.Channel(0).play(jumpscare)
@@ -108,7 +76,7 @@ def spring_death():
     pygame.mixer.Channel(1).play(alarm, loops=11)
     for j in range(1024):
         spring_gif.change(1)
-        screen.blit(spring_gif.image, spring_rects[j // 32])
+        screen.blit(spring_gif.image, (0, 0))
         pygame.display.update()
         gif.change(0.01)
         screen.blit(gif.image, rects[images.index(gif.image)])
@@ -116,36 +84,12 @@ def spring_death():
 
 
 def baby_death():
-    baby_images = [pygame.image.load('gifs/baby/jumpscare/baby1.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby2.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby3.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby4.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby5.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby6.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby7.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby8.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby9.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby10.gif'),
-                   pygame.image.load('gifs/baby/jumpscare/baby11.gif')]
-
-    baby_rects = [baby_images[0].get_rect(center=(960, 540)),
-                  baby_images[1].get_rect(center=(960, 540)),
-                  baby_images[2].get_rect(center=(960, 540)),
-                  baby_images[3].get_rect(center=(960, 540)),
-                  baby_images[4].get_rect(center=(960, 540)),
-                  baby_images[5].get_rect(center=(960, 540)),
-                  baby_images[6].get_rect(center=(960, 540)),
-                  baby_images[7].get_rect(center=(960, 540)),
-                  baby_images[8].get_rect(center=(960, 540)),
-                  baby_images[9].get_rect(center=(960, 540)),
-                  baby_images[10].get_rect(center=(960, 540))]
-
-    baby_gif = Animation(baby_images, time_interval=11)
+    baby_gif = Animation(baby, time_interval=11)
     jumpscare = pygame.mixer.Sound('sounds/jumpscares/baby_jumpscare.mp3')
     pygame.mixer.Channel(0).play(jumpscare)
     for j in range(121):
         baby_gif.change(1)
-        screen.blit(baby_gif.image, baby_rects[j // 11])
+        screen.blit(baby_gif.image, (0, 0))
         pygame.display.update()
         gif.change(0.01)
         screen.blit(gif.image, rects[images.index(gif.image)])
