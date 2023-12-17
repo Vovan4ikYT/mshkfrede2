@@ -25,13 +25,11 @@ vhs_images = [pygame.image.load('vhs/vhs1.jpg'),
 vhs_effect = Animation(vhs_images, time_interval=10)
 ambience = pygame.mixer.Sound('sounds/ambience_night4.mp3')
 pygame.mixer.Channel(0).play(ambience)
+breaker = pygame.image.load('breaker.jpg')
 
 foxy_count, foxy_state = 2000, False
-foxy_x, foxy_y = 1151, 359
-foxy_moves = [pygame.image.load('gifs/old_foxy/old_foxy1.png'),
-              pygame.image.load('gifs/old_foxy/old_foxy2.png'),
-              pygame.image.load('gifs/old_foxy/old_foxy3.png')]
-foxy_moving = Animation(foxy_moves, time_interval=5)
+foxy_moves = pygame.image.load('gifs/old_foxy/old_foxy1.png')
+
 
 def foxy_death():
     scream = pygame.mixer.Sound('sounds/jumpscares/old_foxy_jumpscare.mp3')
@@ -53,9 +51,22 @@ def foxy_move():
         pygame.mixer.Channel(2).set_volume(0.3)
         pygame.mixer.Channel(2).play(foxy_poet)
     if 0 < foxy_count < 800:
-        foxy_moving.change(0.2)
-        screen.blit(foxy_moving.image, (foxy_x, foxy_y))
+        screen.blit(foxy_moves, (1159, 359))
     if foxy_count == 0 and foxy_state is True:
+        foxy_death()
+
+
+def breaking():
+    global foxy_count, foxy_state
+    flash = pygame.mixer.Sound('sounds/flash.mp3')
+    pygame.mixer.Channel(2).play(flash)
+    screen.fill((255, 255, 255))
+    pygame.display.update()
+    pygame.time.delay(100)
+    if foxy_state is True:
+        foxy_state = False
+        foxy_count = 2000
+    else:
         foxy_death()
 
 
@@ -65,6 +76,8 @@ while True:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
             print(event.pos)
+            if event.pos[0] in range(940, 975) and event.pos[1] in range(633, 635):
+                breaking()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_w:
             scream = pygame.mixer.Sound('sounds/jumpscares/old_freddy_jumpscare.mp3')
             pygame.mixer.Channel(0).play(scream)
@@ -107,5 +120,6 @@ while True:
     clock.tick(60)
     vhs_effect.change(0.7)
     screen.blit(vhs_effect.image, (0, 0))
+    screen.blit(breaker, (935, 610))
     foxy_move()
     pygame.display.update()
