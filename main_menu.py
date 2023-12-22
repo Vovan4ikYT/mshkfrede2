@@ -23,7 +23,7 @@ night = current[0]
 if night == 5:
     anim = 'springtrap'
     color = 'lime'
-    pygame.mixer.music.load(choice(['music/the_hunt.mp3', 'music/its_me.mp3']))
+    pygame.mixer.music.load(choice(['music/the_hunt.mp3', 'music/its_me.mp3', 'music/follow_me.mp3']))
 else:
     anim = choice(['freddy', 'baby', 'candy'])
     color = 'deepskyblue'
@@ -46,7 +46,7 @@ class TextLabels():
         self.texts = [self.fonts[0].render('FREDDYS RETURN', True, color),
                       self.fonts[1].render('ЗНАКОМОЕ МЕСТО', True, color),
                       self.fonts[1].render('Выбор ночи', True, color)]
-        self.exit_deny = self.fonts[1].render('Выйти', True, color)
+        self.exit_deny = self.fonts[1].render('Выйти', True, 'red')
         self.help, self.info = (self.fonts[1].render('Инструкция', True, color),
                                 self.fonts[1].render('Об игре', True, color))
         self.continue_night = self.fonts[1].render(f'Продолжить: Ночь {current[0]}', True, color)
@@ -71,7 +71,7 @@ class TextLabels():
     def text_change(self):
         if count % 2 != 0:
             self.texts.remove(self.texts[2])
-            self.exit_deny = self.fonts[1].render('Назад', True, color)
+            self.exit_deny = self.fonts[1].render('Назад', True, 'red')
             temp = []
             for night in available_nights:
                 temp.append(self.fonts[1].render(f'Ночь {night}', True, color))
@@ -82,7 +82,7 @@ class TextLabels():
                 if i != 0 and i != 1:
                     self.texts.remove(self.texts[i])
             self.texts.append(self.fonts[1].render('Выбор ночи', True, color))
-            self.exit_deny = self.fonts[1].render('Выйти', True, color)
+            self.exit_deny = self.fonts[1].render('Выйти', True, 'red')
 
 
 pygame.mixer.music.set_volume(0.3)

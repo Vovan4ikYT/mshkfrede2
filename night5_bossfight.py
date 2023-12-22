@@ -2,7 +2,7 @@ import pygame
 import sys
 from random import choice
 from animation import Animation
-from jumpscares import baby
+from jumpscares import baby, springtrap1, springtrap2
 
 pygame.mixer.init(channels=2)
 pygame.init()
@@ -36,39 +36,10 @@ spring_current = 'idle'
 
 
 def spring_death():
-    spring_images = [pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap1.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap2.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap3.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap4.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap5.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap6.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap7.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap8.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap9.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap10.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap11.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap12.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap13.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap14.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap15.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap16.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap17.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap18.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap19.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap20.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap21.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap22.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap23.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap24.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap25.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap26.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap27.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap28.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap29.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap30.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap31.gif'),
-                     pygame.image.load(f'gifs/springtrap/jumpscare{anim}/springtrap32.gif')]
-
+    if anim == '1':
+        spring_images = springtrap1
+    else:
+        spring_images = springtrap2
     spring_gif = Animation(spring_images, time_interval=32)
     jumpscare = pygame.mixer.Sound('sounds/jumpscares/spring_jumpscare.mp3')
     pygame.mixer.Channel(0).play(jumpscare)
@@ -80,7 +51,7 @@ def spring_death():
         pygame.display.update()
         gif.change(0.01)
         screen.blit(gif.image, rects[images.index(gif.image)])
-    import end_screen
+    import lose
 
 
 def baby_death():
@@ -93,7 +64,7 @@ def baby_death():
         pygame.display.update()
         gif.change(0.01)
         screen.blit(gif.image, rects[images.index(gif.image)])
-    import end_screen
+    import lose
 
 
 def spring_move():
