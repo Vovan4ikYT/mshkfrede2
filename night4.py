@@ -268,6 +268,8 @@ while True:
         am_count = 15000
         if am == 6:
             pygame.mixer.Channel(0).stop()
+            if pygame.mouse.get_visible() is False:
+                pygame.mouse.set_visible(True)
             import sixam
             sys.exit()
     if count % 2 == 0:
