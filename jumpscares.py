@@ -2,6 +2,33 @@ import pygame
 
 pygame.init()
 
+candy = [pygame.image.load('gifs/candy/jumpscare/candy1.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy2.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy3.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy4.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy5.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy6.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy7.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy8.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy9.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy10.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy11.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy12.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy13.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy14.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy15.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy16.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy17.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy18.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy19.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy20.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy21.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy22.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy23.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy24.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy25.gif'),
+         pygame.image.load('gifs/candy/jumpscare/candy26.gif')]
+
 old_freddy = [pygame.image.load('gifs/old_freddy/jumpscare/old_freddy1.png'),
               pygame.image.load('gifs/old_freddy/jumpscare/old_freddy2.png'),
               pygame.image.load('gifs/old_freddy/jumpscare/old_freddy3.png'),
