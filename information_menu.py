@@ -2,6 +2,7 @@
 
 import pygame
 import sys
+import subprocess
 
 pygame.mixer.init()
 pygame.init()
@@ -60,6 +61,8 @@ while True:
                 pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() - 0.1)
             elif i.pos[0] in range(1885, 1915) and i.pos[1] in range(795, 845):
                 pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + 0.1)
+            elif i.pos[0] in range(676, 1240) and i.pos[1] in range(910, 931):
+                subprocess.run(["start", "https://github.com/Vovan4ikYT/frede"], shell=True)
 
     clock.tick(60)
     screen.blit(text1, (650, 100))
