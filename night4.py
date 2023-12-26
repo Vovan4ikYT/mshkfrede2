@@ -243,46 +243,51 @@ def speaking():
             speak_count = 500
 
 
-while True:
-    if count % 2 != 0:
-        flashlight(pygame.mouse.get_pos())
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
-            print(event.pos)
-            if event.pos[0] in range(940, 975) and event.pos[1] in range(633, 635) and count % 2 == 0:
-                breaking()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            count += 1
-            if count % 2 != 0:
-                pygame.mouse.set_visible(False)
-            else:
-                pygame.mouse.set_visible(True)
+def night4():
+    global count, am_count, am
+    while True:
+        if count % 2 != 0:
+            flashlight(pygame.mouse.get_pos())
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+                print(event.pos)
+                if event.pos[0] in range(940, 975) and event.pos[1] in range(633, 635) and count % 2 == 0:
+                    breaking()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                count += 1
+                if count % 2 != 0:
+                    pygame.mouse.set_visible(False)
+                else:
+                    pygame.mouse.set_visible(True)
 
-    clock.tick(60)
-    am_count -= 5
-    print(am_count)
-    if am_count == 0:
-        am += 1
-        am_count = 15000
-        if am == 6:
-            pygame.mixer.Channel(0).stop()
-            if pygame.mouse.get_visible() is False:
-                pygame.mouse.set_visible(True)
-            import sixam
-            sys.exit()
-    if count % 2 == 0:
-        vhs_effect1.change(0.7)
-        screen.blit(vhs_effect1.image, (0, 0))
-        screen.blit(breaker, (935, 610))
-    else:
-        vhs_effect2.change(0.7)
-        screen.blit(vhs_effect2.image, (0, 0))
-    foxy_move()
-    freddy_move()
-    bc_move()
-    am_text = font.render(f'{am}:00 AM', True, 'white')
-    screen.blit(am_text, (1680, 0))
-    speaking()
-    pygame.display.update()
+        clock.tick(60)
+        am_count -= 5
+        if am_count == 0:
+            am += 1
+            am_count = 15000
+            if am == 6:
+                pygame.mixer.Channel(0).stop()
+                if pygame.mouse.get_visible() is False:
+                    pygame.mouse.set_visible(True)
+                import sixam
+                sys.exit()
+        if count % 2 == 0:
+            vhs_effect1.change(0.7)
+            screen.blit(vhs_effect1.image, (0, 0))
+            screen.blit(breaker, (935, 610))
+        else:
+            vhs_effect2.change(0.7)
+            screen.blit(vhs_effect2.image, (0, 0))
+        foxy_move()
+        freddy_move()
+        bc_move()
+        am_text = font.render(f'{am}:00 AM', True, 'white')
+        screen.blit(am_text, (1680, 0))
+        speaking()
+        pygame.display.update()
+
+
+if __name__ == '__main__':
+    night4()
