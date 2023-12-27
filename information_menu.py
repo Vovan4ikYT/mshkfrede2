@@ -12,7 +12,7 @@ clock = pygame.time.Clock()
 
 pygame.mixer.music.load('music/real_ambient.mp3')
 
-back_image = pygame.image.load('office_night5/office2.png').convert()
+back_image = pygame.image.load('ofices/office2.png').convert()
 
 background_image = pygame.transform.scale(back_image, (1920, 1080))
 
