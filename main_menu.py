@@ -23,7 +23,7 @@ night = current[0]
 if night == 5:
     anim = 'springtrap'
     color = 'lime'
-    pygame.mixer.music.load(choice(['music/the_hunt.mp3', 'music/its_me.mp3', 'music/follow_me.mp3']))
+    pygame.mixer.music.load(choice(['music/the_hunt.mp3', 'music/its_me.mp3', 'music/follow_me.mp3', 'music/jaws.mp3']))
 else:
     anim = choice(['freddy', 'baby', 'candy'])
     color = 'deepskyblue'

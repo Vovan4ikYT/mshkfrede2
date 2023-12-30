@@ -1,8 +1,7 @@
 import pygame
 import sys
 from animation import Animation
-from jumpscares import candy
-from random import choice
+from jumpscares import candy, popgoes
 
 pygame.mixer.init(channels=3)
 pygame.init()
@@ -15,13 +14,26 @@ repair_surfs = [pygame.image.load('gifs/candy/repair/candy1.png'),
                 pygame.image.load('gifs/candy/repair/candy2.png'),
                 pygame.image.load('gifs/candy/repair/candy1_repair.png'),
                 pygame.image.load('gifs/candy/repair/candy2_repair.png')]
+popgoes_surfs = [pygame.image.load('gifs/popgoes/popgoes1.png'),
+                 pygame.image.load('gifs/popgoes/popgoes2.png')]
 cur_candy = repair_surfs[0]
+cur_popgoes = popgoes_surfs[0]
+
 music_tape = None
+music_tape_candy = pygame.mixer.Sound('sounds/candy_tape.mp3')
+music_tape_popgoes = pygame.mixer.Sound('sounds/popgoes_tape.mp3')
+
 tool = False
 
 candy_gif = Animation(candy, time_interval=26)
 candy_count = 350
 candy_state = 'idle'
+
+popgoes_gif = Animation(popgoes, time_interval=6)
+popgoes_count = 350
+halun = Animation([pygame.image.load('gifs/popgoes/halun/halun1.png'),
+                   pygame.image.load('gifs/popgoes/halun/halun2.png'),
+                   pygame.image.load('gifs/popgoes/halun/halun3.png')], time_interval=3)
 
 repair_details = [pygame.image.load('gifs/candy/repair/repair_right_leg.png'),
                   pygame.image.load('gifs/candy/repair/repair_left_leg.png'),
@@ -39,6 +51,17 @@ def candy_death():
     for i in range(676):
         candy_gif.change(1)
         screen.blit(candy_gif.image, (0, 0))
+        pygame.display.update()
+    sys.exit()
+
+
+def popgoes_death():
+    scream = pygame.mixer.Sound('sounds/jumpscares/popgoes_jumpscare.mp3')
+    pygame.mixer.Channel(0).play(scream)
+    for i in range(36):
+        screen.fill((0, 0, 0))
+        popgoes_gif.change(1)
+        screen.blit(popgoes_gif.image, (0, 0))
         pygame.display.update()
     sys.exit()
 
@@ -85,11 +108,18 @@ def check_detail():
 
 while True:
     if repaired == 99:
+        pygame.mixer.Channel(1).stop()
         import sixam
     if pygame.mixer.Channel(1).get_busy() is True:
-        candy_count += 1
+        if music_tape == music_tape_candy:
+            candy_count += 1
+            popgoes_count -= 1
+        if music_tape == music_tape_popgoes:
+            popgoes_count += 1
+            candy_count -= 1
     else:
         candy_count -= 1
+        popgoes_count -= 1
     if candy_count <= 200:
         if left_count != 3:
             left_count = 0
@@ -107,12 +137,26 @@ while True:
             elif candy_state == 'repair':
                 cur_candy = repair_surfs[3]
     elif candy_count > 200:
-        if candy_count == 350:
+        if candy_count >= 350:
             pygame.mixer.Channel(1).stop()
         if candy_state == 'idle':
             cur_candy = repair_surfs[0]
         elif candy_state == 'repair':
             cur_candy = repair_surfs[2]
+
+    if popgoes_count <= 200:
+        if popgoes_count == 0:
+            popgoes_death()
+        else:
+            cur_popgoes = popgoes_surfs[1]
+            halun.change(1)
+            screen.blit(halun.image, (0, 0))
+            pygame.display.update()
+    elif popgoes_count > 200:
+        if popgoes_count >= 350:
+            pygame.mixer.Channel(1).stop()
+        cur_popgoes = popgoes_surfs[0]
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -123,7 +167,10 @@ while True:
                 pygame.mixer.Channel(2).play(nos)
                 candy_state = 'repair'
             if event.pos[0] in range(1828, 1863) and event.pos[1] in range(869, 896):
-                music_tape = pygame.mixer.Sound('sounds/candy_tape.mp3')
+                music_tape = music_tape_candy
+                pygame.mixer.Channel(1).play(music_tape)
+            if event.pos[0] in range(1859, 1898) and event.pos[1] in range(869, 896):
+                music_tape = music_tape_popgoes
                 pygame.mixer.Channel(1).play(music_tape)
             if event.pos[0] in range(508, 547) and event.pos[1] in range(824, 880):
                 print(tool)
@@ -141,6 +188,7 @@ while True:
     screen.blit(tape_player, (1565, 620))
     screen.blit(box, (579, 737))
     screen.blit(tool_surf, (479, 807))
+    screen.blit(cur_popgoes, (-100, 300))
     repair_box()
     check_detail()
     pygame.display.update()

@@ -14,25 +14,63 @@ clock = pygame.time.Clock()
 images = [pygame.image.load('office_night5/office2_boss.png'),
           pygame.image.load('office_night5/office1_boss.png')]
 
-rects = [images[0].get_rect(center=(960, 540)),
-         images[1].get_rect(center=(960, 540))]
-
-alert = pygame.image.load('alert.png')
-
-shocks = [pygame.image.load('shock1.png'), pygame.image.load('shock2.png')]
-shock_rects = [shocks[0].get_rect(center=(400, 800)), shocks[1].get_rect(center=(1463, 800))]
+dc = pygame.mixer.Sound('sounds/shock.mp3')
 
 spring_counter = 90
+surprize = False
 baby_counter, baby_state = 180, False
-power = 100
 
 gif = Animation(images, time_interval=0.5)
 
 music = pygame.mixer.Sound('music/our_little_horror_story.mp3')
 pygame.mixer.Channel(0).play(music)
 
-spring_positions = ['idle', 'out', 'cam07', 'cam04', choice(['cam02', 'cam03']), 'office']
+spring_positions = ['idle', 'out', 'cam07', 'cam04', choice(['cam02', 'cam03']), choice(['left', 'right']), 'office']
 spring_current = 'idle'
+cooldown = 0
+
+font = pygame.font.Font('font.otf', 50)
+am_count = 0
+am = 2
+cam_count = 0
+cameras = ['cam01', 'cam02', 'cam03', 'cam04', 'cam05', 'cam06', 'cam07',
+           'cam02_springtrap', 'cam03_springtrap', 'cam04_springtrap', 'cam07_springtrap']
+cam_surfs = [pygame.image.load('cameras/empty/cam01_empty.png'),
+             pygame.image.load('cameras/empty/cam02_empty.png'),
+             pygame.image.load('cameras/empty/cam03_empty.png'),
+             pygame.image.load('cameras/empty/cam04_empty.png'),
+             pygame.image.load('cameras/empty/cam05_empty.png'),
+             pygame.image.load('cameras/empty/cam06_empty.png'),
+             pygame.image.load('cameras/empty/cam07_empty.png'),
+             pygame.image.load('cameras/springtrap/cam02_springtrap.png'),
+             pygame.image.load('cameras/springtrap/cam03_springtrap.png'),
+             pygame.image.load('cameras/springtrap/cam04_springtrap.png'),
+             pygame.image.load('cameras/springtrap/cam07_springtrap.png')]
+camera = 'cam01'
+
+monitor_up = [pygame.image.load('cameras/monitor/up/monitor_up1.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up2.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up3.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up4.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up5.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up6.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up7.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up8.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up9.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up10.gif'),
+              pygame.image.load('cameras/monitor/up/monitor_up11.gif')]
+
+monitor_down = [pygame.image.load('cameras/monitor/down/monitor_down1.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down2.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down3.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down4.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down5.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down6.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down7.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down8.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down9.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down10.gif'),
+                pygame.image.load('cameras/monitor/down/monitor_down11.gif')]
 
 
 def spring_death():
@@ -50,8 +88,15 @@ def spring_death():
         screen.blit(spring_gif.image, (0, 0))
         pygame.display.update()
         gif.change(0.01)
-        screen.blit(gif.image, rects[images.index(gif.image)])
+        screen.blit(gif.image, (0, 0))
     import lose
+
+
+def cam_show():
+    if cam_count % 2 != 0:
+        rec = cam_surfs[cameras.index(camera)]
+        screen.blit(rec, (0, 0))
+        pygame.display.update()
 
 
 def baby_death():
@@ -63,16 +108,17 @@ def baby_death():
         screen.blit(baby_gif.image, (0, 0))
         pygame.display.update()
         gif.change(0.01)
-        screen.blit(gif.image, rects[images.index(gif.image)])
+        screen.blit(gif.image, (0, 0))
     import lose
 
 
 def spring_move():
-    global anim, spring_current
+    global anim, spring_current, surprize
     try:
         spring_current = spring_positions[spring_positions.index(spring_current) + 1]
+        surprize = choice([True, False])
     except IndexError:
-        if spring_positions[spring_positions.index(spring_current) - 1] == 'cam02':
+        if spring_positions[spring_positions.index(spring_current) - 1] == 'left':
             anim = '1'
         else:
             anim = '2'
@@ -89,35 +135,50 @@ def baby_glitching():
 
 
 def alertion():
-    if spring_current == 'cam02':
-        alert_rect = alert.get_rect(center=(100, 50))
-        screen.blit(alert, alert_rect)
+    global surprize
+    if surprize is True:
+        alert = pygame.image.load('alert_surprize.png')
+    else:
+        alert = pygame.image.load('alert.png')
+    if spring_current == 'left':
+        screen.blit(alert, (100, 0))
         pygame.display.update()
-    elif spring_current == 'cam03':
-        alert_rect = alert.get_rect(center=(1820, 50))
-        screen.blit(alert, alert_rect)
+    elif spring_current == 'right':
+        screen.blit(alert, (1820, 0))
         pygame.display.update()
 
 
 def left_shocker():
-    global spring_current, power
-    power -= 1
-    if spring_current == 'cam02':
-        spring_current = 'idle'
-    dc = pygame.mixer.Sound('sounds/shock.mp3')
-    pygame.mixer.Channel(1).play(dc)
+    global spring_current, cooldown, surprize
+    if cooldown == 0:
+        if (spring_current == 'left' and surprize is False) or (spring_current == 'right' and surprize is True):
+            spring_current = 'idle'
+        pygame.mixer.Channel(1).play(dc)
+        screen.fill((0, 0, 0))
+        pygame.display.update()
+        cooldown = 50
+    else:
+        pass
 
 
 def right_shocker():
-    global spring_current, power
-    power -= 1
-    if spring_current == 'cam03':
-        spring_current = 'idle'
-    dc = pygame.mixer.Sound('sounds/shock.mp3')
-    pygame.mixer.Channel(1).play(dc)
+    global spring_current, cooldown, surprize
+    if cooldown == 0:
+        if (spring_current == 'right' and surprize is False) or (spring_current == 'left' and surprize is True):
+            spring_current = 'idle'
+        pygame.mixer.Channel(1).play(dc)
+        screen.fill((0, 0, 0))
+        pygame.display.update()
+        cooldown = 50
+    else:
+        pass
 
 
 while True:
+    am_count += 5
+    if am_count == 7350:
+        am += 1
+        am_count = 0
     spring_counter -= 1
     if spring_counter == 0:
         spring_move()
@@ -129,34 +190,91 @@ while True:
             baby_counter = 180
         else:
             baby_death()
-
-    power -= 0.1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                sys.exit()
-            elif event.key == pygame.K_z:
-                power -= 1
-                dc = pygame.mixer.Sound('sounds/shock.mp3')
-                pygame.mixer.Channel(1).play(dc)
-                if baby_state is True:
-                    baby_state = False
-                    baby_counter = 180
         if event.type == pygame.MOUSEBUTTONDOWN:
             print(event.pos)
-            if event.pos[0] in range(375, 433) and event.pos[1] in range(640, 667):
+            if event.pos[0] in range(385, 443) and event.pos[1] in range(620, 650):
                 left_shocker()
-            elif event.pos[0] in range(1415, 1471) and event.pos[1] in range(640, 667):
+            elif event.pos[0] in range(1380, 1429) and event.pos[1] in range(620, 650):
                 right_shocker()
+        if event.type == pygame.KEYDOWN:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                cam_count += 1
+                if cam_count % 2 != 0:
+                    monitor = Animation(monitor_up, time_interval=11)
+                    for i in range(121):
+                        monitor.change(1)
+                        screen.blit(monitor.image, (0, 0))
+                        pygame.display.update()
+                else:
+                    monitor = Animation(monitor_down, time_interval=11)
+                    for i in range(121):
+                        screen.blit(gif.image, (0, 0))
+                        monitor.change(1)
+                        screen.blit(monitor.image, (0, 0))
+                        pygame.display.update()
+            elif keys[pygame.K_ESCAPE]:
+                sys.exit()
+            elif keys[pygame.K_z]:
+                if cam_count % 2 == 0:
+                    if cooldown == 0:
+                        pygame.mixer.Channel(1).play(dc)
+                        screen.fill((0, 0, 0))
+                        pygame.display.update()
+                        cooldown = 50
+                        if baby_state is True:
+                            baby_state = False
+                            baby_counter = 180
+                    else:
+                        pass
+            elif keys[pygame.K_1]:
+                if cam_count % 2 != 0:
+                    camera = 'cam01'
+            elif keys[pygame.K_2]:
+                if cam_count % 2 != 0:
+                    if spring_current == 'cam02':
+                        camera = 'cam02_springtrap'
+                    else:
+                        camera = 'cam02'
+            elif keys[pygame.K_3]:
+                if cam_count % 2 != 0:
+                    if spring_current == 'cam03':
+                        camera = 'cam03_springtrap'
+                    else:
+                        camera = 'cam03'
+            elif keys[pygame.K_4]:
+                if cam_count % 2 != 0:
+                    if spring_current == 'cam04':
+                        camera = 'cam04_springtrap'
+                    else:
+                        camera = 'cam04'
+            elif keys[pygame.K_5]:
+                if cam_count % 2 != 0:
+                    camera = 'cam05'
+            elif keys[pygame.K_6]:
+                if cam_count % 2 != 0:
+                    camera = 'cam06'
+            elif keys[pygame.K_7]:
+                if cam_count % 2 != 0:
+                    if spring_current == 'cam07':
+                        camera = 'cam07_springtrap'
+                    else:
+                        camera = 'cam07'
 
     clock.tick(60)
-
     gif.change(0.005)
-    screen.blit(gif.image, rects[images.index(gif.image)])
-    screen.blit(shocks[0], shock_rects[0])
-    screen.blit(shocks[1], shock_rects[1])
-    baby_glitching()
-    alertion()
+    cam_show()
+    if cam_count % 2 == 0:
+        screen.blit(gif.image, (0, 0))
+        baby_glitching()
+        alertion()
+        am_text = font.render(f'{am}:00 AM', True, 'purple')
+        screen.blit(am_text, (1680, 100))
+    if cooldown != 0:
+        cooldown -= 1
+    else:
+        pass
     pygame.display.update()

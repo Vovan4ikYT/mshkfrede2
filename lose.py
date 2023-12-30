@@ -13,10 +13,10 @@ images = [pygame.image.load('gifs/static/static1.gif'),
           pygame.image.load('gifs/static/static3.gif'),
           pygame.image.load('gifs/static/static4.gif')]
 
-gif = Animation(images, 1)
+gif = Animation(images, 5)
+count = 0
 
 surf = pygame.image.load('screens/game_over_night5_boss.png')
-rect = surf.get_rect(center=(960, 540))
 font = pygame.font.Font('font2.ttf', 50)
 text = font.render('Я ВСЕГДА ВОЗВРАЩАЮСЬ.', True, '#842593')
 
@@ -24,14 +24,13 @@ pygame.mixer.music.load('sounds/static_sound.mp3')
 pygame.mixer.music.play()
 
 while True:
-    if pygame.time.get_ticks() < 21500:
-        gif.change(0.1)
-        screen.blit(gif.image, (0, 0))
-        pygame.display.update()
-    elif 21500 <= pygame.time.get_ticks() <= 29999:
+    gif.change(0.5)
+    screen.blit(gif.image, (0, 0))
+    count += 5
+    if count >= 15000:
         screen.blit(surf, (0, 0))
         screen.blit(text, (1250, 1010))
-        pygame.display.update()
-    elif pygame.time.get_ticks() > 30000:
+    pygame.display.update()
+    if count == 17000:
         import main_menu
         sys.exit()
