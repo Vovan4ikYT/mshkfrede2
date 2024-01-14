@@ -1,5 +1,7 @@
 import pygame
+import random
 import sys
+import time
 
 # Инициализация Pygame
 pygame.init()
@@ -33,11 +35,15 @@ zapis = pygame.mixer.Sound('sounds/nightfm2.mp3')
 zapis.play()
 pygame.mixer.music.load('music/night2amb.mp3')
 pygame.mixer.music.play(-1)
+sound2 = pygame.mixer.Sound("sounds/work.mp3")
 # Начальная комната
 current_room = "left-room"
 show_message = True
 work_progress = 0
 # Основной цикл программы
+mangle_attack_interval = 5  # 2 минуты и 5 секунд в секундах
+mangle_attack_timer = time.time() + mangle_attack_interval
+mangle_attack_active = False
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -67,12 +73,10 @@ while True:
 
     if current_room == "left-room":
         screen.blit(image1, (0, 0))
-        # Отрисовка прозрачной овальной кнопки с текстом
         text = font.render("Перейти в правую комнату", True, (255, 255, 255))
         screen.blit(text, (1300, 955))
     elif current_room == "right-room":
         screen.blit(image2, (0, 0))
-        # Отрисовка прозрачной овальной кнопки с текстом
         text = font.render("Перейти в левую комнату", True, (255, 255, 255))
         screen.blit(text, (42, 955))
         if show_message:
@@ -83,7 +87,6 @@ while True:
     work_str = str(work_percent)
     work_percents = work_str[:4]
 
-    # Рассчитываем проценты от 0 до 100 относительно 200
     text_percent = font.render(f"Работа: {work_percents}%", True, (255, 255, 255))
     screen.blit(text_percent, (SCREEN_WIDTH - text_percent.get_width() - 20, 20))
 
@@ -91,7 +94,38 @@ while True:
         pygame.quit()
         sys.exit()
 
+    current_time = time.time()
+    if current_time > mangle_attack_timer and not mangle_attack_active:
+        mangle_attack_active = True
+        sound2.play()
+        mangle_attack_timer = current_time + random.uniform(2, 5)
 
+        if current_room == "right-room":
+            # Если игрок в правой комнате, даем ему 3 секунды на переход в левую комнату
+            time_limit = current_time + 3
+
+            waiting_for_transition = True
+            if current_time > mangle_attack_timer and not mangle_attack_active:
+                mangle_attack_active = True
+                sound2.play()
+                mangle_attack_timer = current_time + random.uniform(2, 5)
+                if current_room == "left-room":
+                    mangle_attack_active = False
+
+                if current_room == "right-room":
+                    # Если игрок в правой комнате, даем ему 3 секунды на переход в левую комнату
+                    time_limit = current_time + 3
+
+                    while time.time() < time_limit:
+                        pass
+
+                    # Если игрок не перешел в левую комнату за 3 секунды, завершаем игру
+                    if current_room == "right-room":
+                        pygame.quit()
+                        sys.exit()
+
+                    elif current_room == "left-room":
+                        mangle_attack_active = False
 
     pygame.display.flip()
     pygame.time.Clock().tick(60)
