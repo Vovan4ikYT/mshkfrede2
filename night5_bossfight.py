@@ -27,6 +27,8 @@ pygame.mixer.Channel(0).play(music)
 
 spring_positions = ['idle', 'out', 'cam07', 'cam04', choice(['cam02', 'cam03']), choice(['left', 'right']), 'office']
 spring_current = 'idle'
+
+cool = pygame.mixer.Sound('sounds/cooldown.mp3')
 cooldown = 0
 
 font = pygame.font.Font('font.otf', 50)
@@ -158,7 +160,7 @@ def left_shocker():
         pygame.display.update()
         cooldown = 50
     else:
-        pass
+        pygame.mixer.Channel(1).play(cool)
 
 
 def right_shocker():
@@ -171,14 +173,17 @@ def right_shocker():
         pygame.display.update()
         cooldown = 50
     else:
-        pass
+        pygame.mixer.Channel(1).play(cool)
 
 
 while True:
     am_count += 5
-    if am_count == 7350:
+    if am_count == 7400:
         am += 1
         am_count = 0
+        if am == 6:
+            import sixam
+            sys.exit()
     spring_counter -= 1
     if spring_counter == 0:
         spring_move()
@@ -229,7 +234,7 @@ while True:
                             baby_state = False
                             baby_counter = 180
                     else:
-                        pass
+                        pygame.mixer.Channel(1).play(cool)
             elif keys[pygame.K_1]:
                 if cam_count % 2 != 0:
                     camera = 'cam01'
