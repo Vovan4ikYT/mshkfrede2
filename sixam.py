@@ -1,3 +1,5 @@
+# УРАААААААААААААААААААААААААААА МЕНЯ НЕ СЪЕЛ МИШКА ФРЕДЕ
+
 import pygame
 import sys
 
@@ -6,6 +8,7 @@ pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
 screen.fill((0, 0, 0))
 
+# эПичНыЙ пЕрЕхОд с 5 нА 6 уТрА
 am = 5
 am_count = 10000
 font = pygame.font.Font('font_main.ttf', 100)

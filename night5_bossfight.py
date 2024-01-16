@@ -1,7 +1,9 @@
 import pygame
 import sys
+import sqlite3
 from random import choice
 from animation import Animation
+from cutscene import Cutscene
 from jumpscares import baby, springtrap1, springtrap2
 
 pygame.mixer.init(channels=2)
@@ -11,11 +13,29 @@ screen = pygame.display.set_mode((1920, 1080))
 screen.fill((0, 0, 0))
 clock = pygame.time.Clock()
 
+# БД
+ending = ''
+con = sqlite3.connect('nights.sqlite')
+cur = con.cursor()
+
+# Ну вот и конец саги Freddys Return! Готовы увидеть концовку?
+minigames = cur.execute('''SELECT minigame1, minigame2, minigame3, minigame4, minigame5 from minigames''').fetchall()
+if all(i == 'unlocked' for i in minigames):
+    cur.execute('''UPDATE ending SET ending = 'good' ''').fetchall()
+    ending = 'good'
+    con.commit()
+else:
+    cur.execute('''UPDATE ending SET ending = 'bad' ''').fetchall()
+    ending = 'bad'
+    con.commit()
+con.close()
+
 images = [pygame.image.load('office_night5/office2_boss.png'),
           pygame.image.load('office_night5/office1_boss.png')]
 
 dc = pygame.mixer.Sound('sounds/shock.mp3')
 
+# Спрингтрап и Бейби
 spring_counter = 90
 surprize = False
 baby_counter, baby_state = 180, False
@@ -25,16 +45,20 @@ gif = Animation(images, time_interval=0.5)
 music = pygame.mixer.Sound('music/our_little_horror_story.mp3')
 pygame.mixer.Channel(0).play(music)
 
+
 spring_positions = ['idle', 'out', 'cam07', 'cam04', choice(['cam02', 'cam03']), choice(['left', 'right']), 'office']
 spring_current = 'idle'
 
+# Перезарядка тока
 cool = pygame.mixer.Sound('sounds/cooldown.mp3')
 cooldown = 0
 
-font = pygame.font.Font('font.otf', 50)
+# Время
 am_count = 0
 am = 2
 cam_count = 0
+
+# Камеры
 cameras = ['cam01', 'cam02', 'cam03', 'cam04', 'cam05', 'cam06', 'cam07',
            'cam02_springtrap', 'cam03_springtrap', 'cam04_springtrap', 'cam07_springtrap']
 cam_surfs = [pygame.image.load('cameras/empty/cam01_empty.png'),
@@ -94,6 +118,7 @@ def spring_death():
     import lose
 
 
+# Отображение камер
 def cam_show():
     if cam_count % 2 != 0:
         rec = cam_surfs[cameras.index(camera)]
@@ -114,6 +139,7 @@ def baby_death():
     import lose
 
 
+# Атака Спрингтрапа
 def spring_move():
     global anim, spring_current, surprize
     try:
@@ -127,6 +153,7 @@ def spring_move():
         spring_death()
 
 
+# Бейби и её состояния
 def baby_glitching():
     baby_surfs = [pygame.image.load('gifs/baby/glitch1.png'), pygame.image.load('gifs/baby/glitch2.png')]
     baby_rects = [baby_surfs[0].get_rect(center=(950, 700)), baby_surfs[1].get_rect(center=(950, 700))]
@@ -136,6 +163,7 @@ def baby_glitching():
         screen.blit(baby_surfs[1], baby_rects[1])
 
 
+# Предупреждение о Спрингтрапе
 def alertion():
     global surprize
     if surprize is True:
@@ -150,6 +178,7 @@ def alertion():
         pygame.display.update()
 
 
+# Левый шокер
 def left_shocker():
     global spring_current, cooldown, surprize
     if cooldown == 0:
@@ -163,6 +192,7 @@ def left_shocker():
         pygame.mixer.Channel(1).play(cool)
 
 
+# Правй шокер
 def right_shocker():
     global spring_current, cooldown, surprize
     if cooldown == 0:
@@ -177,13 +207,22 @@ def right_shocker():
 
 
 while True:
+    # Изначально здесь показывали время. Но здесь тайминги для него удалось словить, а с 0 до 2 часов нет
     am_count += 5
     if am_count == 7400:
         am += 1
         am_count = 0
+
+        # Победа и концовка
         if am == 6:
-            import sixam
+            if ending == 'bad':
+                end = Cutscene('cutscenes/bad_ending.mp4', 'sounds/cutscenes/bad_ending.mp3')
+            else:
+                end = Cutscene('cutscenes/good_ending.mp4', 'sounds/cutscenes/good_ending.mp3')
+            end.play_cutscene()
             sys.exit()
+
+    # Атаки аниматроников
     spring_counter -= 1
     if spring_counter == 0:
         spring_move()
@@ -195,18 +234,24 @@ while True:
             baby_counter = 180
         else:
             baby_death()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             print(event.pos)
+
+            # Ток
             if event.pos[0] in range(385, 443) and event.pos[1] in range(620, 650):
                 left_shocker()
             elif event.pos[0] in range(1380, 1429) and event.pos[1] in range(620, 650):
                 right_shocker()
+
         if event.type == pygame.KEYDOWN:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
+
+                # Включение камер
                 cam_count += 1
                 if cam_count % 2 != 0:
                     monitor = Animation(monitor_up, time_interval=11)
@@ -222,6 +267,10 @@ while True:
                         screen.blit(monitor.image, (0, 0))
                         pygame.display.update()
             elif keys[pygame.K_ESCAPE]:
+
+                # Выход из ночи
+                con.close()
+                import main_menu
                 sys.exit()
             elif keys[pygame.K_z]:
                 if cam_count % 2 == 0:
@@ -235,6 +284,8 @@ while True:
                             baby_counter = 180
                     else:
                         pygame.mixer.Channel(1).play(cool)
+
+            # Камеры
             elif keys[pygame.K_1]:
                 if cam_count % 2 != 0:
                     camera = 'cam01'
@@ -276,8 +327,6 @@ while True:
         screen.blit(gif.image, (0, 0))
         baby_glitching()
         alertion()
-        am_text = font.render(f'{am}:00 AM', True, 'purple')
-        screen.blit(am_text, (1680, 100))
     if cooldown != 0:
         cooldown -= 1
     else:

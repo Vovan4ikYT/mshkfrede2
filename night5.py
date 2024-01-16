@@ -1,30 +1,48 @@
 import pygame
 import sys
+import sqlite3
 from random import choice
 from animation import Animation
+from cutscene import Cutscene
 from jumpscares import freddy, chica, mangle, candy
 
-pygame.mixer.init(channels=3)
+pygame.mixer.init(channels=4)
 pygame.init()
 
 screen = pygame.display.set_mode((1920, 1080))
 screen.fill((0, 0, 0))
 clock = pygame.time.Clock()
 
+# БД
+con = sqlite3.connect('nights.sqlite')
+cur = con.cursor()
+
+cur.execute('''UPDATE night_info SET current = 'current' WHERE night = '5' ''').fetchall()  # Текущая ночь
+cur.execute('''UPDATE night_info SET current = NULL WHERE night NOT LIKE '5' ''').fetchall()  # Остальные не текущие
+con.commit()
+
+# Мигающий свет в офисе
 images = [pygame.image.load('office_night5/office2.png'),
           pygame.image.load('office_night5/office1.png')]
 
+# Звуки
 dc = pygame.mixer.Sound('sounds/shock.mp3')
 
 music = pygame.mixer.Sound('music/london_bridge.mp3')
 pygame.mixer.Channel(0).set_volume(0.3)
 pygame.mixer.Channel(0).play(music)
 
+zapis = pygame.mixer.Sound('sounds/nightfm5.mp3')
+pygame.mixer.Channel(4).set_volume(0.2)
+pygame.mixer.Channel(4).play(zapis)
+
+# Перезарядка тока
 cool = pygame.mixer.Sound('sounds/cooldown.mp3')
 cooldown = 0
 
 gif = Animation(images, time_interval=0.5)
 
+# Камеры (не обновляются)
 cam_count = 0
 cameras = ['cam01', 'cam02', 'cam03', 'cam04', 'cam05', 'cam06', 'cam07',
            'cam01_freddy', 'cam02_freddy', 'cam03_freddy', 'cam04_freddy',
@@ -72,30 +90,35 @@ monitor_down = [pygame.image.load('cameras/monitor/down/monitor_down1.gif'),
                 pygame.image.load('cameras/monitor/down/monitor_down10.gif'),
                 pygame.image.load('cameras/monitor/down/monitor_down11.gif')]
 
+# Фредди
 fred_counter = 900
 fred_positions = ['idle', 'out', choice(['cam03', 'cam04']), choice(['cam01', 'cam02']), 'office']
 fred_current = 'idle'
 
+# Кэнди
 candy_counter = 800
 candy_positions = ['idle', 'out', 'cam07', 'cam06', choice(['left', 'right']), 'office']
 candy_current = 'idle'
 candy1 = pygame.image.load('gifs/candy/candy_night5_1.png')
 candy2 = pygame.image.load('gifs/candy/candy_night5_2.png')
 
+# Мангл
 mangle_counter = 1200
 mangle_state = 4
 mangle_surf = pygame.image.load('gifs/mangle/mangle1.png')
 
+# Чика
 chica_counter = 3300
 cupcake = pygame.image.load('gifs/chica/cupcake.png')
 chica_office = False
 
-am_count = 0
-am = 0
-font = pygame.font.Font('font.otf', 50)
+# Катсцена
+cutscene_night5 = Cutscene('cutscenes/cutscene_night5.mp4', 'sounds/cutscenes/cutscene_night5.mp3')
 
 
 def freddy_death():
+    for channel in range(pygame.mixer.get_num_channels()):
+        pygame.mixer.Channel(channel).stop()
     freddy_gif = Animation(freddy, time_interval=15)
     scream = pygame.mixer.Sound('sounds/jumpscares/freddy_jumpscare.mp3')
     pygame.mixer.Channel(0).play(scream)
@@ -104,9 +127,11 @@ def freddy_death():
         screen.blit(gif.image, (0, 0))
         screen.blit(freddy_gif.image, (0, 0))
         pygame.display.update()
+    import lose
     sys.exit()
 
 
+# Атака Фредди
 def freddy_move():
     global fred_current, fred_positions
     try:
@@ -122,6 +147,8 @@ def freddy_move():
 
 
 def chica_death():
+    for channel in range(pygame.mixer.get_num_channels()):
+        pygame.mixer.Channel(channel).stop()
     chica_gif = Animation(chica, time_interval=8)
     scream = pygame.mixer.Sound('sounds/jumpscares/chica_jumpscare.mp3')
     pygame.mixer.Channel(0).play(scream)
@@ -130,10 +157,13 @@ def chica_death():
         screen.blit(gif.image, (0, 0))
         screen.blit(chica_gif.image, (0, 0))
         pygame.display.update()
+    import lose
     sys.exit()
 
 
 def mangle_death():
+    for channel in range(pygame.mixer.get_num_channels()):
+        pygame.mixer.Channel(channel).stop()
     mangle_gif = Animation(mangle, time_interval=16)
     scream = pygame.mixer.Sound('sounds/jumpscares/mangle_jumpscare.mp3')
     pygame.mixer.Channel(0).play(scream)
@@ -142,9 +172,11 @@ def mangle_death():
         screen.blit(gif.image, (0, 0))
         screen.blit(mangle_gif.image, (0, 0))
         pygame.display.update()
+    import lose
     sys.exit()
 
 
+# Атака Мангл
 def mangle_move():
     global mangle_state
     mangle_state -= 1
@@ -153,6 +185,8 @@ def mangle_move():
 
 
 def candy_death():
+    for channel in range(pygame.mixer.get_num_channels()):
+        pygame.mixer.Channel(channel).stop()
     candy_gif = Animation(candy, time_interval=26)
     scream = pygame.mixer.Sound('sounds/jumpscares/candy_jumpscare.mp3')
     pygame.mixer.Channel(0).play(scream)
@@ -161,9 +195,11 @@ def candy_death():
         screen.blit(gif.image, (0, 0))
         screen.blit(candy_gif.image, (0, 0))
         pygame.display.update()
+    import lose
     sys.exit()
 
 
+# Атака Кэнди
 def candy_move():
     global candy_current, candy_positions
     try:
@@ -172,6 +208,7 @@ def candy_move():
         candy_death()
 
 
+# Отображение камер
 def cam_show():
     if cam_count % 2 != 0:
         rec = cam_surfs[cameras.index(camera)]
@@ -180,10 +217,14 @@ def cam_show():
 
 
 while True:
-    am_count += 5
-    if am_count == 106000:
-        am += 1
-        am_count = 0
+    # Победа
+    if not pygame.mixer.Channel(0).get_busy():
+        cutscene_night5.play_cutscene()
+        con.close()
+        import night5_bossfight
+        sys.exit()
+
+    # Атаки аниматроников
     fred_counter -= 1
     if fred_counter == 0:
         freddy_move()
@@ -202,11 +243,18 @@ while True:
     if chica_counter == 0:
         chica_office = False
         chica_counter = 3000
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            for channel in range(pygame.mixer.get_num_channels()):
+                pygame.mixer.Channel(channel).stop()
+            con.close()
+            import main_menu
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             print(event.pos)
+
+            # Ток
             if event.pos[0] in range(385, 443) and event.pos[1] in range(620, 650):
                 if cooldown == 0:
                     pygame.mixer.Channel(1).play(dc)
@@ -219,6 +267,8 @@ while True:
                     cooldown = 250
                 else:
                     pygame.mixer.Channel(1).play(cool)
+
+            # Ток
             elif event.pos[0] in range(1380, 1429) and event.pos[1] in range(620, 650):
                 if cooldown == 0:
                     pygame.mixer.Channel(1).play(dc)
@@ -231,8 +281,17 @@ while True:
                     cooldown = 250
                 else:
                     pygame.mixer.Channel(1).play(cool)
+
+            elif event.pos[0] in range(800, 812) and event.pos[1] in range(706, 709):
+                # Миниигра
+                for channel in range(pygame.mixer.get_num_channels()):
+                    pygame.mixer.Channel(channel).stop()
+                con.close()
+                import minigame_5
         if event.type == pygame.KEYDOWN:
             keys = pygame.key.get_pressed()
+
+            # Ток
             if keys[pygame.K_z]:
                 if cooldown == 0:
                     pygame.mixer.Channel(1).play(dc)
@@ -245,8 +304,14 @@ while True:
                     cooldown = 250
                 else:
                     pygame.mixer.Channel(1).play(cool)
+
+            # Выход из ночи
             elif keys[pygame.K_ESCAPE]:
+                con.close()
+                import main_menu
                 sys.exit()
+
+            # Открытие камер
             elif keys[pygame.K_SPACE]:
                 cam_count += 1
                 if cam_count % 2 != 0:
@@ -262,6 +327,8 @@ while True:
                         monitor.change(1)
                         screen.blit(monitor.image, (0, 0))
                         pygame.display.update()
+
+            # Камеры
             elif keys[pygame.K_1]:
                 if cam_count % 2 != 0:
                     if fred_current == 'cam01':
@@ -308,6 +375,8 @@ while True:
                         camera = 'cam07_candy'
                     else:
                         camera = 'cam07'
+
+    # Перезарядка
     if cooldown != 0:
         cooldown -= 1
     gif.change(0.0005)
@@ -322,5 +391,4 @@ while True:
             screen.blit(candy2, (1570, 653))
         if chica_office is True:
             screen.blit(cupcake, (810, 964))
-        screen.blit(font.render(f'{am}:00 AM', True, 'white'), (1680, 0))
     pygame.display.update()
